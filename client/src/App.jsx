@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
 
@@ -10,6 +10,36 @@ function Input() {
   });
 
   const [spots, setSpots] = useState([]);
+
+  const fetchPlanes = async () => {
+    try {
+      const response = await axios.get(
+        'http://localhost:5000/api/planes'
+      );
+  
+      setSpots(response.data);
+  
+    } catch (err) {
+      console.error("Error fetching planes:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPlanes();
+  }, []);
+
+  const deletePlane = async (id) => {
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/planes/${id}`
+      );
+  
+      fetchPlanes();
+  
+    } catch (err) {
+      console.error("Error deleting plane:", err);
+    }
+  };
 
   const handleChange = (event) => {
     setPlaneInfo({
@@ -29,7 +59,7 @@ function Input() {
 
       console.log(response.data);
 
-      setSpots(prev => [...prev, planeInfo]);
+      fetchPlanes();
 
       // Clear form after submit
       setPlaneInfo({
@@ -82,8 +112,13 @@ function Input() {
 
       <ul>
         {spots.map((spot, index) => (
-          <li key={index}>
-            {spot.planetype} — {spot.location} — {spot.date}
+          <li key={spot._id}>
+            {spot.planetype} — {spot.location} —{" "}
+            {new Date(spot.date).toLocaleDateString()}
+          
+            <button onClick={() => deletePlane(spot._id)}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>

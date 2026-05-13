@@ -16,7 +16,7 @@ app.get('/api/hello', (req, res) => {
   res.json({ message: "Hello from the MERN Server!" });
 });
 
-//Create New Plane Spotting Entry
+// Create New Plane Spotting Entry
 app.post('/api/newplane', async (req, res) => {
   try {
     console.log(req.body);
@@ -32,6 +32,40 @@ app.post('/api/newplane', async (req, res) => {
     res.status(201).json({
       message: "Plane spotting entry saved!",
       data: user,
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: err.message,
+    });
+  }
+});
+
+// Get all plane spotting entries
+app.get('/api/planes', async (req, res) => {
+  try {
+    const planes = await UserModel.find();
+
+    res.status(200).json(planes);
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: err.message,
+    });
+  }
+});
+
+// Delete plane spotting entry
+app.delete('/api/planes/:id', async (req, res) => {
+  try {
+    await UserModel.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      message: "Plane deleted successfully",
     });
 
   } catch (err) {
